@@ -3,7 +3,7 @@ import time
 import warnings
 import numpy as np
 import torch
-import open_earth_map.oem as oem
+import oem
 import torchvision
 from pathlib import Path
 
