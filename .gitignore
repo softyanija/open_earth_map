@@ -11,6 +11,7 @@ __pycache__/
 OpenEarthMap_Mini/
 predictions/
 outputs/
+png/
 backups/
 *.pth
 build/
