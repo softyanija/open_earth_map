@@ -49,10 +49,12 @@ if __name__ == "__main__":
     save_fns = []
 
     network.eval().to(DEVICE)
+        
     for test_fn in test_fns:
         img = Image.fromarray(oem.dataset.load_multiband(test_fn))
         
         w, h = img.size[:2]
+        print("w : ",w,"h : ",h)
         power_h = math.ceil(np.log2(h) / np.log2(2))
         power_w = math.ceil(np.log2(w) / np.log2(2))
         if 2**power_h != h or 2**power_w != w:
