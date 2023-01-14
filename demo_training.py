@@ -6,6 +6,8 @@ import torch
 import oem
 import torchvision
 from pathlib import Path
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 warnings.filterwarnings("ignore")
 
@@ -23,6 +25,8 @@ if __name__ == "__main__":
     NUM_EPOCHS = 3
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
     OUTPUT_DIR = "outputs"
+    GRAPH_DIR = "graphs"
+    LOG_DIR = "logs"
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     fns = [f for f in Path(OEM_DATA_DIR).rglob("*.tif") if "/images/" in str(f)]
@@ -77,8 +81,11 @@ if __name__ == "__main__":
     criterion = oem.losses.JaccardLoss()
 
     max_score = 0
+    valid_losses = []
+    
     for epoch in range(NUM_EPOCHS):
         print(f"\nEpoch: {epoch + 1}")
+        x = list(range(1,NUM_EPOCHS+1))
 
         train_logs = oem.runners.train_epoch(
             model=network,
@@ -95,6 +102,11 @@ if __name__ == "__main__":
             device=DEVICE,
         )
 
+        
+        #tem_loss = valid_logs["Loss"]
+        #print("tem_loss = {}".format(tem_loss))
+        valid_losses += [valid_logs["Loss"]] 
+        
         epoch_score = valid_logs["Score"]
         if max_score < epoch_score:
             max_score = epoch_score
@@ -105,5 +117,23 @@ if __name__ == "__main__":
                 model_name="model2.pth",
                 output_dir=OUTPUT_DIR,
             )
+
+    plt.figure(figsize=(12,8))
+    plt.xlabel("Epoc", fontsize=15)
+    plt.ylabel("Loss", fontsize=15)
+    plt.grid()
+    plt.plot(x,valid_losses)
+    plt.savefig(GRAPH_DIR+"/graph_test.png")
+    
+    """
+    fig, ax = plt.subplots()
+    ax.get_xaxis().get_major_formatter().set_useOffset(False)
+    ax.get_xaxis().set_major_locator(MaxNLocator(integer=True))
+    ax.grid()
+    ax.plot(x,valid_losses)
+    
+    plt.plot()
+    """
+    #plt.show
 
     print("Elapsed time: {:.3f} min".format((time.time() - start) / 60.0))
